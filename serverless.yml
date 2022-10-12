@@ -1,0 +1,88 @@
+service: back-serverless
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8001
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: false
+      convertEmptyValues: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+
+  stage: dev
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
+
+functions:
+  listUsers:
+    handler: handler.listUsers
+    events:
+      - httpApi:
+          path: /users
+          method: get
+  findUser:
+    handler: handler.findUser
+    events:
+      - httpApi:
+          path: /user/{userId}
+          method: get
+  createUser:
+    handler: handler.createUser
+    events:
+      - httpApi:
+          path: /user
+          method: post
+  updateUser:
+    handler: handler.updateUser
+    events:
+      - httpApi:
+          path: /user/{userId}
+          method: put
+  removeUser:
+    handler: handler.removeUser
+    events:
+      - httpApi:
+          path: /user/{userId}
+          method: delete
+
+resources:
+  Resources:
+    UsersDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: USERS
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        

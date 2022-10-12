@@ -1,0 +1,19 @@
+{
+  "name": "back-serverless",
+  "version": "1.0.0",
+  "description": "Back End serverless",
+  "main": "handler.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "Ademilson Carvalho",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline": "^11.1.1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1231.0",
+    "uuid": "^9.0.0"
+  }
+}
